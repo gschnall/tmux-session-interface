@@ -1,0 +1,6 @@
+#ignore
+./session-scripts/*
+
+# Don't ignore
+!.gitignore
+!./session-scripts/sample-session.sh
