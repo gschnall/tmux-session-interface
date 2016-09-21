@@ -3,4 +3,7 @@
 
 # Don't ignore
 !.gitignore
-!./session-scripts/sample-session.sh
+!./session-scripts/complex-sample-session-template.sh
+!./session-scripts/vertical-split.sh
+!./session-scripts/horizontal-split.sh
+!./session-scripts/four-square-split.sh
