@@ -5,9 +5,9 @@ A quick example of a sample tmux session configuration. It includes a python scr
 
 ### How to Use
 - Clone this repository into your home directory
-- In your bashrc include this: alias tss='python ~/.tmux-scripts/start-session.py'
+- In your bashrc include this: alias tsm='python ~/.tmux-scripts/start-session.py'
 - Be sure you're using python 2 to run the script
-- tss stands for Tmux Session Starter
+- tsm stands for Tmux Session Manager 
 - restart your terminal application
 - run 'tss' and select your scripted session with the proper number
 - The sample configuration file includes easy to understand comments 

@@ -112,8 +112,10 @@ def generateAllSessions(sessions, scripts):
   return allSessions
 
 def selectAction(sessNumb, sessions, scripts, scriptDir):
-  sessionName = getName(sessions[sessNumb])
-  sessState = getState(sessions[sessNumb])
+  #:: Handle empty first session in session list 
+  s_num = sessNumb-1 if a_session_is_alive(sessions) else sessNumb
+  sessionName = getName(sessions[s_num])
+  sessState = getState(sessions[s_num])
   if sessState == "a": 
     subprocess.call(["tmux", "detach", "-s" + sessionName])
   elif sessState == "d":
@@ -136,6 +138,9 @@ def killSession(sessions, sessNumb):
     print "Exiting..."
     time.sleep(2000)
     print "  "
+
+def a_session_is_alive(sessions):
+  return sessions[0] != "d:"
 
 def is_attached(session):
   sessState = getState(session)
@@ -168,28 +173,33 @@ def prSessionAttached(col, sessions):
     if is_attached(s) == "detached":
       print col.OKBLUE + str(ind+1) + col.ENDC + ': ' + sessName + " (" + col.WARNING + "Session-Detached" + col.ENDC + ")" + killText(col, ind+1)
     elif is_attached(s) == "attached":
-      print col.OKBLUE + str(ind+1) + col.ENDC + ': ' + sessName + " (" + col.OKGREEN + "detach" + col.ENDC + ")" + killText(col, ind+1)
+        print col.OKBLUE + str(ind+1) + col.ENDC + ': ' + sessName + " (" + "d:" + col.OKGREEN + "detach" + col.ENDC + ")" + killText(col, ind+1)
     elif is_attached(s) == "script":
       print col.OKBLUE + str(ind+1) + col.ENDC + ': ' + sessName
 
 def printInSessionOptions(col):
   print col.OKBLUE + 'q' + col.ENDC + ':' + ' Quit Your Tmux Sessions'
-  print col.OKBLUE + 'ka' + col.ENDC + ':' + ' Kill All Tmux Sessions'
+  print col.WARNING + 'ka' + col.ENDC + ':' + ' Kill All Tmux Sessions'
 
-def printDefaultOptions(col):
+def printDefaultOptions(col, sessions):
   print col.OKBLUE + 'q' + col.ENDC + ':' + ' Quit Tmux Session Manager'
   print col.OKBLUE + 'n' + col.ENDC + ':' + ' New Tmux Session'
+  if a_session_is_alive(sessions):
+    print col.WARNING + 'ka' + col.ENDC + ':' + ' Kill All Sessions'
 
 def printSessionInformation(col, sessions):
-  if sessions[0] == "d:":
+  if a_session_is_alive(sessions): 
+    return
+  else:
     print "- " + col.OKBLUE + "No current active sessions" + col.ENDC
     print '**************************'
+
 
 def prScripts(scripts, sessions, userInSession, col):
   if userInSession:
     printInSessionOptions(col)
   else:
-    printDefaultOptions(col)
+    printDefaultOptions(col, sessions)
   print '**************************'
   printSessionInformation(col, sessions)
   # Continue printing rest of program
@@ -213,6 +223,7 @@ def prScripts(scripts, sessions, userInSession, col):
 
 def handleInput(scriptDir, sessions, scripts):
   session = raw_input("What session would you like to start?\n")
+  print sessions
   if session == "0" or session == "q" or session == "quit":
     print 'Exiting'
     print ''
@@ -222,7 +233,7 @@ def handleInput(scriptDir, sessions, scripts):
     killAllSessions()
   elif stlowrmsp(session[0]) == "k" and re.findall(r'\d+', stlowrmsp(session)) != []:
     killSession(sessions, returnKillNumb(stlowrmsp(session)))
-  elif session.isdigit() and int(session)-1 < len(scripts):
+  elif session.isdigit() and int(session)-1 < len(sessions):
     selectAction(int(session), sessions, scripts, scriptDir)
   elif not (session.isdigit()):
     print '' 
