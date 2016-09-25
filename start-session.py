@@ -61,7 +61,6 @@ def getSessions():
     if re.search('\(attached\)', sess) > -1:
       sessionArr[sessionArr.index(sess)] = "a:" + sess
       sessData[0] = True
-      print sess.split(":")[0]
       sessData[2] = sess.split(":")[0]
     else:
       sessionArr[sessionArr.index(sess)] = "d:" + sess
@@ -95,7 +94,7 @@ def stlowrmsp(inp): #str lower & remove spaces
   return str(inp).replace("  ","").lower()
 
 def killText(col, n):
-  return " (" + "kill:" + col.FAIL + "k" + str(n) + col.ENDC + ")"
+    return " (" + col.FAIL + "k" + str(n) + col.ENDC + ":kill)"
 # ||---------------------------||
 
 def generateAllSessions(sessions, scripts):
@@ -153,17 +152,48 @@ def is_attached(session):
   else:
     return False
 
+def start_session_horizontal_split():
+  scriptDir = sys.path[0] + '/.important-session-scripts/'
+  subprocess.call(["sh", scriptDir+"horizontal.sh"])
+
+def start_session_vertical_split():
+  scriptDir = sys.path[0] + '/.important-session-scripts/'
+  subprocess.call(["sh", scriptDir+"vertical.sh"])
+
+def horizontally_split_window():
+  subprocess.call(['tmux', 'split-window', '-v'])
+
+def vertically_split_window():
+  subprocess.call(['tmux', 'split-window', '-h'])
+
+def switch_pane():
+  OKBLUE = '\033[94m'
+  ENDC = '\033[0m'
+  subprocess.call(['tmux', 'display-panes'])
+  subprocess.call(['clear'])
+  print ""
+  print OKBLUE + 'q' + ENDC + ':' + 'Quit Tmux-Session-Manager' + OKBLUE + ' s' + ENDC + ':' + 'show pane numbers'
+  paneNumb = raw_input("Switch to pane number: ")
+  if paneNumb == "q" or paneNumb == "quit":
+    print 'Exiting'
+    print ''
+  elif paneNumb == "s":
+    subprocess.call(['tmux', 'display-panes'])
+    switch_pane()
+  elif paneNumb.isdigit():
+    subprocess.call(['tmux', 'select-pane', '-t ' + str(paneNumb)])
+
 def prNoneActive(col, scripts):
   for script in scripts:
-    print col.OKBLUE + str(scripts.index(script)+1) + col.ENDC + ': ' + script.split('.')[0] + " (" + col.OKBLUE + "start" + col.ENDC + ")"
+    print col.OKBLUE + str(scripts.index(script)+1) + col.ENDC + ': ' + script.split('.')[0] + " (" + col.OKBLUE + str(ind+1) + ":start" + col.ENDC + ")"
 
 def prNoneAttached(col, sessions):
   for ind, s in enumerate(sessions): 
     sessName = getName(s)
     if is_attached(s) == "detached":
-      print col.OKBLUE + str(ind+1) + col.ENDC + ': ' + sessName + " (" + col.OKGREEN + "attach" + col.ENDC + ")" + killText(col, ind+1)
+      print col.OKBLUE + str(ind+1) + col.ENDC + ': ' + sessName + " (" + col.OKGREEN + str(ind+1) + ":attach" + col.ENDC + ")" + killText(col, ind+1)
     elif is_attached(s) == "script":
-      print col.OKBLUE + str(ind+1) + col.ENDC + ': ' + sessName + " (" + col.OKBLUE + "start" + col.ENDC + ")"
+      print col.OKBLUE + str(ind+1) + col.ENDC + ': ' + sessName + " (" + col.OKBLUE + str(ind+1) + ":start" + col.ENDC + ")"
 
 def prSessionAttached(col, sessions):
   print "- " + col.OKBLUE + "You are in a session" + col.ENDC
@@ -178,12 +208,15 @@ def prSessionAttached(col, sessions):
       print col.OKBLUE + str(ind+1) + col.ENDC + ': ' + sessName
 
 def printInSessionOptions(col):
-  print col.OKBLUE + 'q' + col.ENDC + ':' + ' Quit Your Tmux Sessions'
+  print col.OKBLUE + 'q' + col.ENDC + ':' + ' Quit Tmux-Session-Manager'
+  print col.OKBLUE + 's' + col.ENDC + ':' + ' Switch Pane'
+  print col.OKBLUE + 'vs' + col.ENDC + ':' + ' Vertical Split' + " | " + col.OKBLUE + 'hs' + col.ENDC + ':' + ' Horizontal Split'
   print col.WARNING + 'ka' + col.ENDC + ':' + ' Kill All Tmux Sessions'
 
 def printDefaultOptions(col, sessions):
-  print col.OKBLUE + 'q' + col.ENDC + ':' + ' Quit Tmux Session Manager'
+  print col.OKBLUE + 'q' + col.ENDC + ':' + ' Quit Tmux-Session-Manager'
   print col.OKBLUE + 'n' + col.ENDC + ':' + ' New Tmux Session'
+  print col.OKBLUE + 'vs' + col.ENDC + ':' + ' Vertical Split' + " | " + col.OKBLUE + 'hs' + col.ENDC + ':' + ' Horizontal Split'
   if a_session_is_alive(sessions):
     print col.WARNING + 'ka' + col.ENDC + ':' + ' Kill All Sessions'
 
@@ -227,6 +260,10 @@ def handleInput(scriptDir, sessions, scripts):
   if session == "0" or session == "q" or session == "quit":
     print 'Exiting'
     print ''
+  elif stlowrmsp(session) == "hs":
+    start_session_horizontal_split()
+  elif stlowrmsp(session) == "vs":
+    start_session_vertical_split()
   elif stlowrmsp(session) == "n":
     startSession()
   elif stlowrmsp(session) == "ka" or stlowrmsp(session[0]) == "kall" or stlowrmsp(session[0]) == "killall":
@@ -251,6 +288,12 @@ def handleActiveSession(activeSessName, sessions):
   if session == "0" or session == "q" or session == "quit":
     print 'Exiting'
     print ''
+  elif stlowrmsp(session) == "hs":
+    horizontally_split_window()
+  elif stlowrmsp(session) == "vs":
+    vertically_split_window()
+  elif stlowrmsp(session) == "s":
+    switch_pane()
   elif stlowrmsp(session[0]) == "ka" or stlowrmsp(session[0]) == "kall" or stlowrmsp(session[0]) == "killall":
     killAllSessions()
   elif stlowrmsp(session[0]) == "k" and re.findall(r'\d+', stlowrmsp(session)) != []:
