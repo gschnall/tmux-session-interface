@@ -68,6 +68,20 @@ def getSessions():
   sessData[1] = sessionArr
   return sessData
 
+def color_text(color, text):
+  endc = '\033[0m'
+  colors = {
+    "blue":'\033[94m',
+    "green":'\033[92m',
+    "yellow":'\033[93m',
+    "red":'\033[91m',
+  }
+  if(color):
+    return colors[color.lower()] + text + endc 
+  else:
+    return "Color must be in string for: " + text
+
+
 # ||Basic return functions------||
 def mapsessions(arr):
   return map(lambda a: a.split(':')[1], arr)
@@ -172,7 +186,7 @@ def switch_pane():
   subprocess.call(['tmux', 'display-panes'])
   subprocess.call(['clear'])
   print ""
-  print OKBLUE + 'q' + ENDC + ':' + 'Quit Tmux-Session-Manager' + OKBLUE + ' s' + ENDC + ':' + 'show pane numbers'
+  print color_text('blue', 'q') + ':' + 'Quit Tmux-Session-Manager' + OKBLUE + ' s' + ENDC + ':' + 'show pane numbers'
   paneNumb = raw_input("Switch to pane number: ")
   if paneNumb == "q" or paneNumb == "quit":
     print 'Exiting'
@@ -185,15 +199,15 @@ def switch_pane():
 
 def prNoneActive(col, scripts):
   for script in scripts:
-    print col.OKBLUE + str(scripts.index(script)+1) + col.ENDC + ': ' + script.split('.')[0] + " (" + col.OKBLUE + str(ind+1) + ":start" + col.ENDC + ")"
+    print col.OKBLUE + str(scripts.index(script)+1) + col.ENDC + ': ' + script.split('.')[0] + " (" + col.OKBLUE + str(scripts.index(script)+1) + col.ENDC + ":start" +  ")"
 
 def prNoneAttached(col, sessions):
   for ind, s in enumerate(sessions): 
     sessName = getName(s)
     if is_attached(s) == "detached":
-      print col.OKBLUE + str(ind+1) + col.ENDC + ': ' + sessName + " (" + col.OKGREEN + str(ind+1) + ":attach" + col.ENDC + ")" + killText(col, ind+1)
+      print color_text('blue', str(ind+1)) + ': ' + sessName + " (" + color_text('green', str(ind+1)) + ":attach" + ")" + killText(col, ind+1)
     elif is_attached(s) == "script":
-      print col.OKBLUE + str(ind+1) + col.ENDC + ': ' + sessName + " (" + col.OKBLUE + str(ind+1) + ":start" + col.ENDC + ")"
+      print color_text('blue', str(ind+1)) + ': ' + sessName + " (" + color_text('blue', str(ind+1)) + ":start" +  ")"
 
 def prSessionAttached(col, sessions):
   print "- " + col.OKBLUE + "You are in a session" + col.ENDC
@@ -203,7 +217,7 @@ def prSessionAttached(col, sessions):
     if is_attached(s) == "detached":
       print col.OKBLUE + str(ind+1) + col.ENDC + ': ' + sessName + " (" + col.WARNING + "Session-Detached" + col.ENDC + ")" + killText(col, ind+1)
     elif is_attached(s) == "attached":
-        print col.OKBLUE + str(ind+1) + col.ENDC + ': ' + sessName + " (" + "d:" + col.OKGREEN + "detach" + col.ENDC + ")" + killText(col, ind+1)
+        print col.OKBLUE + str(ind+1) + col.ENDC + ': ' + sessName + " (" + col.WARNING + "d" + col.ENDC + ":detach" +  ")" + killText(col, ind+1)
     elif is_attached(s) == "script":
       print col.OKBLUE + str(ind+1) + col.ENDC + ': ' + sessName
 
@@ -211,14 +225,14 @@ def printInSessionOptions(col):
   print col.OKBLUE + 'q' + col.ENDC + ':' + ' Quit Tmux-Session-Manager'
   print col.OKBLUE + 's' + col.ENDC + ':' + ' Switch Pane'
   print col.OKBLUE + 'vs' + col.ENDC + ':' + ' Vertical Split' + " | " + col.OKBLUE + 'hs' + col.ENDC + ':' + ' Horizontal Split'
-  print col.WARNING + 'ka' + col.ENDC + ':' + ' Kill All Tmux Sessions'
+  print col.FAIL + 'ka' + col.ENDC + ':' + ' Kill All Tmux Sessions'
 
 def printDefaultOptions(col, sessions):
   print col.OKBLUE + 'q' + col.ENDC + ':' + ' Quit Tmux-Session-Manager'
   print col.OKBLUE + 'n' + col.ENDC + ':' + ' New Tmux Session'
   print col.OKBLUE + 'vs' + col.ENDC + ':' + ' Vertical Split' + " | " + col.OKBLUE + 'hs' + col.ENDC + ':' + ' Horizontal Split'
   if a_session_is_alive(sessions):
-    print col.WARNING + 'ka' + col.ENDC + ':' + ' Kill All Sessions'
+    print col.FAIL + 'ka' + col.ENDC + ':' + ' Kill All Sessions'
 
 def printSessionInformation(col, sessions):
   if a_session_is_alive(sessions): 
