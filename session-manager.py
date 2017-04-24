@@ -51,9 +51,16 @@ def prHeader(col):
 def getSessions():
   sessions = {}
   sessData = [False, [], False]
-  # Get tmux ls output
-  tmuxls = subprocess.Popen(["tmux","ls"], stdout=subprocess.PIPE)
-  tls = tmuxls.communicate()
+  # -- Get tmux ls output --
+  try:
+    tmuxls = subprocess.Popen(["tmux","ls"], stdout=subprocess.PIPE)
+    tls = tmuxls.communicate()
+  except OSError as e:
+    if e.errno == os.errno.ENOENT:
+      warnUserThatTmuxIsNotInstaled() 
+    else:
+      raise
+  # -- ------------------ --
   tlsArr = map(str,tls)
   sessionArr = tlsArr[0].strip().split('\n')
   # Create Arr out with detached or attached sessions
@@ -321,6 +328,16 @@ def handleActiveSession(activeSessName, sessions):
     print "...You are Currently in a Session"
     print '' 
     handleActiveSession(activeSessName, sessions)
+
+def warnUserThatTmuxIsNotInstaled():
+  subprocess.call(['clear'])
+  print ""
+  print "--- You must install tmux in order to use Tmux Session Manager --- \n" 
+  print "To install for Mac use: 'sudo brew install tmux'"
+  print "To install for ubuntu use: 'sudo apt-get install tmux'"
+  print ""
+  print "------------------------------------------------------------------- \n" 
+
 
 
 # start
