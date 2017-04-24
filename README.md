@@ -1,14 +1,11 @@
-# Tmux Session Manager
-
-Table of contents
+## Table of contents
 =================
-- [Tmux Session Manager](#tmux-session-manager)
   * [Description](#description)
   * [Installation](#installation)
   * [Usage](#usage)
 
 ## Description
-A python wrapper for tmux. It provides users with  a terminal interface that makes working with multiple sessions simpler. Users can easily to start, detach, kill, or switch sessions.
+A python wrapper for tmux. It provides users with  a terminal interface that makes working with multiple sessions simpler. Users can easily start, detach, kill, or switch sessions.
 
 ## Installation
 - Clone this repository into your home directory
