@@ -1,15 +1,28 @@
-# Tmux Session Starter
+# Tmux Session Manager
 
-### Description 
-A quick example of a sample tmux session configuration. It includes a python script to easily select and start a specific session configuartion file from the directory.
+Table of contents
+=================
+- [Tmux Session Manager](#tmux-session-manager)
+  * [Description](#description)
+  * [Installation](#installation)
+  * [Usage](#usage)
 
-### How to Use
+## Description
+A python wrapper for tmux. It provides users with  a terminal interface that makes working with multiple sessions simpler. Users can easily to start, detach, kill, or switch sessions.
+
+## Installation
 - Clone this repository into your home directory
-- In your bashrc include this: alias tsm='python ~/.tmux-scripts/start-session.py'
-- Be sure you're using python 2 to run the script
-- tsm stands for Tmux Session Manager 
+- In your bashrc include this: alias tsm='python ~/.tmux-scripts/session-manager.py'
+  - Be sure you are using python 2
+  - tsm stands for Tmux Session Manager
 - restart your terminal application
-- run 'tss' and select your scripted session with the proper number
-- The sample configuration file includes easy to understand comments 
+- Start the program by typing 'tsm' followed by enter into your terminal
+- Note: will be available via pip soon...
 
-### More to come...
+## Usage
+- Start a new session by typing n, provide a name for the session or hit enter to leave it blank.
+- Type 'd' to detach from your current session
+- Type the associated number of a session to
+- Use 'vs' and 'hs' to split the screen vertically or horizontally
+  - If you aren't already in a session, this will automatically start one for you
+- Type 'q' to quit
