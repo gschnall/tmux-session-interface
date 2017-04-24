@@ -144,6 +144,7 @@ def selectAction(sessNumb, sessions, scripts, scriptDir):
     subprocess.call(["sh", scriptDir+"/session-scripts/" + sessionName +'.sh'])
 
 def startSession():
+  subprocess.call(['clear'])
   sessionName = raw_input("Session Name: ")
   subprocess.call(["tmux", "new", "-s" + sessionName])
 
@@ -276,8 +277,7 @@ def prScripts(scripts, sessions, userInSession, col):
   print ''
 
 def handleInput(scriptDir, sessions, scripts):
-  session = raw_input("What session would you like to start?\n")
-  print sessions
+  session = raw_input("What would you like to do?\n")
   if session == "0" or session == "q" or session == "quit":
     print 'Exiting'
     print ''
