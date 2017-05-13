@@ -1,6 +1,15 @@
+#__________________________________________________
+# This is a sample script that demonstrates how to 
+# create your own custom sessions
+#___________________________________________________
+# Place this file in the session-scripts folder to
+# see it appear in Tmux-Session-Manager
+#TTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT
+#---------------------------------------------------
+
 # name of session
 session='sample-session'
-# Main Directory
+# Main Working Directory
 wd="~/Documents"
 # Command to start a server
 server=''
