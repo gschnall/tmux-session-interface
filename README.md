@@ -7,6 +7,8 @@
 ## Description
 A python wrapper for tmux. It provides users with  a terminal interface that makes working with multiple sessions simpler. Users can easily start, detach, kill, or switch sessions.
 
+![Alt text](./screen_shots/screen_shot_1.png?raw=true "Screen Shot 1")
+
 ## Installation
 - Clone this repository into your home directory
   - git clone git@github.com:gschnall/tmux-session-manager.git
@@ -25,6 +27,8 @@ A python wrapper for tmux. It provides users with  a terminal interface that mak
 - Type 'ka' to kill all sessions
 - Type 'q' to quit at any time
 - Though not very useful, you can type 's' to see the pane numbers and switch to a specific pane. It might be useful if you have a complex pane setup.
+
+![Alt text](./screen_shots/screen_shot_2.png?raw=true "Screen Shot 2")
 
 ## Advanced Usage
 - You can also use Tmux-Session-Manager to display and start your own custom tmux scripts.
