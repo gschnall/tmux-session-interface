@@ -2,7 +2,8 @@
 =================
   * [Description](#description)
   * [Installation](#installation)
-  * [Usage](#usage)
+  * [Usage](#basic usage)
+  * [Advanced Usage](#advanced usage)
 
 ## Description
 A python wrapper for tmux. It provides users with  a terminal interface that makes working with multiple sessions simpler. Users can easily start, detach, kill, or switch sessions.
