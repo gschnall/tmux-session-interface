@@ -18,7 +18,7 @@ A python wrapper for tmux. It provides users with  a terminal interface that mak
 - Start the program by typing 'tsm' and hitting enter
 - Note: This will be available via pip soon.
 
-## Basic Usage
+## Usage
 - Start a new session by typing 'n', provide a name for the session or hit enter to leave it blank.
 - Use 'vs' and 'hs' to split the screen vertically or horizontally
   - If you aren't already in a session, this will automatically start one for you
