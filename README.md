@@ -2,8 +2,7 @@
 =================
   * [Description](#description)
   * [Installation](#installation)
-  * [Usage](#basic usage)
-  * [Advanced Usage](#advanced usage)
+  * [Usage](#usage)
 
 ## Description
 A python wrapper for tmux. It provides users with  a terminal interface that makes working with multiple sessions simpler. Users can easily start, detach, kill, or switch sessions.
@@ -33,5 +32,5 @@ A python wrapper for tmux. It provides users with  a terminal interface that mak
 
 ## Advanced Usage
 - You can also use Tmux-Session-Manager to display and start your own custom tmux scripts.
-- Create a bash script that sets up a tmux session and place it in the session-scripts directory 
+- Create a bash script that sets up a tmux session and place it in the session-scripts directory
 - Example scripts can be found in the example-script-directory
