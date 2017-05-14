@@ -27,7 +27,7 @@ def main():
   sessions = generateAllSessions(currentSessions[1], scripts)
   userInSession = currentSessions[0]
   # print user menu
-  prHeader(bcolors)
+  prHeader()
   prScripts(scripts, sessions, userInSession, bcolors)
   # handle user input
   if userInSession:
@@ -38,7 +38,12 @@ def main():
   subprocess.call(['clear'])
 
 # ::PRINTING FUNCTIONS
-def prHeader(col):
+def prHeader():
+  class col:
+    OKBLUE = '\033[94m'
+    OKGREEN = '\033[92m'
+    ENDC = '\033[0m'
+    BOLD = '\033[1m'
   subprocess.call(['clear'])
   print ''
   print col.OKGREEN + '|:::::|::::|:::|:::::::::::|' + col.ENDC
@@ -144,7 +149,7 @@ def selectAction(sessNumb, sessions, scripts, scriptDir):
     subprocess.call(["sh", scriptDir+"/session-scripts/" + sessionName +'.sh'])
 
 def startSession():
-  subprocess.call(['clear'])
+  prHeader()
   sessionName = raw_input("Session Name: ")
   subprocess.call(["tmux", "new", "-s" + sessionName])
 
@@ -192,7 +197,7 @@ def switch_pane():
   OKBLUE = '\033[94m'
   ENDC = '\033[0m'
   subprocess.call(['tmux', 'display-panes'])
-  subprocess.call(['clear'])
+  prHeader()
   print ""
   print color_text('blue', 'q') + ':' + 'Quit Tmux-Session-Manager' + OKBLUE + ' s' + ENDC + ':' + 'show pane numbers'
   paneNumb = raw_input("Switch to pane number: ")
@@ -337,8 +342,6 @@ def warnUserThatTmuxIsNotInstaled():
   print "To install for ubuntu use: 'sudo apt-get install tmux'"
   print ""
   print "------------------------------------------------------------------- \n" 
-
-
 
 # start
 main()
