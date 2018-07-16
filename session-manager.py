@@ -21,7 +21,8 @@ def main():
 
   # fetch scripts
   scriptDir = sys.path[0]
-  scripts = os.listdir(scriptDir + '/session-scripts')
+  # scripts = os.listdir(scriptDir + '/session-scripts')
+  scripts = []
   # fetch sessions
   currentSessions = getSessions()
   sessions = generateAllSessions(currentSessions[1], scripts)
@@ -35,7 +36,7 @@ def main():
   else:
     handleInput(scriptDir, sessions, scripts)
 
-  subprocess.call(['clear'])
+  subprocess.call(["sh", scriptDir+"/rebound-scripts/rebound.sh"])
 
 # ::PRINTING FUNCTIONS
 def prHeader():
@@ -46,11 +47,11 @@ def prHeader():
     BOLD = '\033[1m'
   subprocess.call(['clear'])
   print ''
-  print col.OKGREEN + '|:::::|::::|:::|:::::::::::|' + col.ENDC
-  print col.OKBLUE  + '|--  -|-  -|-  |-- --  --  |' + col.ENDC
-  print col.BOLD    + '|---| Tmux-Session-Manager |' + col.ENDC
-  print col.OKBLUE  + '|--  -|-  -|-  |-- --  --  |' + col.ENDC
-  print col.OKGREEN + '|:::::|::::|:::|:::::::::::|' + col.ENDC
+  print col.OKGREEN + '|:::::|::::|:::|:::::::::::::::::::|' + col.ENDC
+  print col.OKBLUE  + '|--  -|-  -|-  |-- |--  --  -- -- -|' + col.ENDC
+  print col.BOLD    + '|---| Tmux-Session-Manager \[O-O]/ |' + col.ENDC
+  print col.OKBLUE  + '|--  -|-  -|-  |-- |--  --  -- ----|' + col.ENDC
+  print col.OKGREEN + '|:::::|::::|:::|:::::::::::::::::::|' + col.ENDC
   print ''
 
 def getSessions():
@@ -93,6 +94,12 @@ def color_text(color, text):
   else:
     return "Color must be in string for: " + text
 
+# ||Rebound functions-----------||
+def writeReboundScript(script):
+  script = script + "&&clear" if script else "clear"
+  f = open(sys.path[0] + "/rebound-scripts/rebound.sh", "w")
+  f.write(script)
+  f.close()
 
 # ||Basic return functions------||
 def mapsessions(arr):
@@ -141,24 +148,31 @@ def selectAction(sessNumb, sessions, scripts, scriptDir):
   s_num = sessNumb-1 if a_session_is_alive(sessions) else sessNumb
   sessionName = getName(sessions[s_num])
   sessState = getState(sessions[s_num])
-  if sessState == "a": 
-    subprocess.call(["tmux", "detach", "-s" + sessionName])
+  if sessState == "a":
+    subprocess.call(["tmux", "detach", "-s " + sessionName])
   elif sessState == "d":
-    subprocess.call(["tmux", "attach-session", "-t" + sessionName])
+    subprocess.call(["tmux", "attach-session", "-t", sessionName])
   else:
     subprocess.call(["sh", scriptDir+"/session-scripts/" + sessionName +'.sh'])
+
+def switchToSession(sessNumb, activeSessName, sessions):
+  s_num = sessNumb-1 if a_session_is_alive(sessions) else sessNumb
+  sessionName = getName(sessions[s_num])
+  writeReboundScript("tmux attach-session -t " + sessionName)
+  subprocess.call(["clear"])
+  subprocess.call(["tmux", "detach", "-s", activeSessName])
 
 def startSession():
   prHeader()
   sessionName = raw_input("Session Name: ")
-  subprocess.call(["tmux", "new", "-s" + sessionName])
+  subprocess.call(["tmux", "new", "-s", sessionName.strip()])
 
 def killAllSessions():
   subprocess.call(["killall", "tmux"])
 
 def killSession(sessions, sessNumb):
   if( sessions[sessNumb-1] > -1 ):
-    subprocess.call(["tmux", "kill-session", "-t" + getName(sessions[sessNumb-1])])
+    subprocess.call(["tmux", "kill-session", "-t", getName(sessions[sessNumb-1])])
   else:
     print "...Session number not found."
     print "Exiting..."
@@ -222,26 +236,27 @@ def prNoneAttached(col, sessions):
     elif is_attached(s) == "script":
       print color_text('blue', str(ind+1)) + ': ' + sessName + " (" + color_text('blue', str(ind+1)) + ":start" +  ")"
 
-def prSessionAttached(col, sessions):
-  print "- " + col.OKBLUE + "You are in a session" + col.ENDC
-  print '**************************'
+def prSessionAttached(col, sessions, sessionName):
+  print "- " + col.OKBLUE + "in session " + col.OKGREEN + sessionName + col.ENDC
+  print ''
   for ind, s in enumerate(sessions):
     sessName = getName(s)
     if is_attached(s) == "detached":
-      print col.OKBLUE + str(ind+1) + col.ENDC + ': ' + sessName + " (" + col.WARNING + "Session-Detached" + col.ENDC + ")" + killText(col, ind+1)
+      print col.OKBLUE + str(ind+1) + col.ENDC + ': ' + sessName + " (" + col.WARNING + "Detached" + col.ENDC + ")" + killText(col, ind+1)
     elif is_attached(s) == "attached":
-        print col.OKBLUE + str(ind+1) + col.ENDC + ': ' + sessName + " (" + col.WARNING + "d" + col.ENDC + ":detach" +  ")" + killText(col, ind+1)
+        print col.OKBLUE + str(ind+1) + col.ENDC + ': ' + col.OKGREEN + sessName + col.ENDC + " (" + col.WARNING + "d" + col.ENDC + ":detach" +  ")" + killText(col, ind+1)
     elif is_attached(s) == "script":
       print col.OKBLUE + str(ind+1) + col.ENDC + ': ' + sessName
 
 def printInSessionOptions(col):
-  print col.OKBLUE + 'q' + col.ENDC + ':' + ' Quit Tmux-Session-Manager'
+  print col.OKBLUE + 'q' + col.ENDC + ':' + ' Quit'
+  print col.OKBLUE + 'n' + col.ENDC + ':' + ' New Tmux Session'
   print col.OKBLUE + 's' + col.ENDC + ':' + ' Switch Pane'
   print col.OKBLUE + 'vs' + col.ENDC + ':' + ' Vertical Split' + " | " + col.OKBLUE + 'hs' + col.ENDC + ':' + ' Horizontal Split'
-  print col.FAIL + 'ka' + col.ENDC + ':' + ' Kill All Tmux Sessions'
+  # print col.FAIL + 'ka' + col.ENDC + ':' + ' Kill All Tmux Sessions'
 
 def printDefaultOptions(col, sessions):
-  print col.OKBLUE + 'q' + col.ENDC + ':' + ' Quit Tmux-Session-Manager'
+  print col.OKBLUE + 'q' + col.ENDC + ':' + ' Quit'
   print col.OKBLUE + 'n' + col.ENDC + ':' + ' New Tmux Session'
   print col.OKBLUE + 'vs' + col.ENDC + ':' + ' Vertical Split' + " | " + col.OKBLUE + 'hs' + col.ENDC + ':' + ' Horizontal Split'
   if a_session_is_alive(sessions):
@@ -252,15 +267,13 @@ def printSessionInformation(col, sessions):
     return
   else:
     print "- " + col.OKBLUE + "No current active sessions" + col.ENDC
-    print '**************************'
-
 
 def prScripts(scripts, sessions, userInSession, col):
   if userInSession:
     printInSessionOptions(col)
   else:
     printDefaultOptions(col, sessions)
-  print '**************************'
+  print ''
   printSessionInformation(col, sessions)
   # Continue printing rest of program
   attachedSession = False
@@ -269,11 +282,12 @@ def prScripts(scripts, sessions, userInSession, col):
   for s in sessions: 
     if is_attached(s) == "attached":
       attachedSession = True
+      attachedSessionName = getName(s)
     elif is_attached(s) == "detached":
      activeSession = True 
   # Print functions 
   if( attachedSession ):
-    prSessionAttached(col, sessions)
+    prSessionAttached(col, sessions, attachedSessionName)
   elif( activeSession ): 
     prNoneAttached(col, sessions)
   else:
@@ -282,26 +296,35 @@ def prScripts(scripts, sessions, userInSession, col):
   print ''
 
 def handleInput(scriptDir, sessions, scripts):
-  session = raw_input("What would you like to do?\n")
+  session = raw_input("\[O_O]/ --What would you like to do?\n\n> ")
   if session == "0" or session == "q" or session == "quit":
+    writeReboundScript(False)
     print 'Exiting'
     print ''
   elif stlowrmsp(session) == "hs":
+    writeReboundScript(False)
     start_session_horizontal_split()
   elif stlowrmsp(session) == "vs":
+    writeReboundScript(False)
     start_session_vertical_split()
   elif stlowrmsp(session) == "n":
+    writeReboundScript(False)
     startSession()
   elif stlowrmsp(session) == "ka" or stlowrmsp(session[0]) == "kall" or stlowrmsp(session[0]) == "killall":
+    writeReboundScript(False)
     killAllSessions()
+    main()
   elif stlowrmsp(session[0]) == "k" and re.findall(r'\d+', stlowrmsp(session)) != []:
+    writeReboundScript(False)
     killSession(sessions, returnKillNumb(stlowrmsp(session)))
+    main()
   elif session.isdigit() and int(session)-1 < len(sessions):
+    writeReboundScript(False)
     selectAction(int(session), sessions, scripts, scriptDir)
   elif not (session.isdigit()):
-    print '' 
+    print ''
     print "please enter a number"
-    print '' 
+    print ''
     handleInput()
   else:
     print '' 
@@ -310,24 +333,42 @@ def handleInput(scriptDir, sessions, scripts):
     handleInput()
 
 def handleActiveSession(activeSessName, sessions):
-  session = raw_input("Would you like to detach session, kill it, or quit? (d,k,q)\n")
+  session = raw_input("\[O_O]/ --What would you like to do?\n\n> ")
   if session == "0" or session == "q" or session == "quit":
+    writeReboundScript(False)
     print 'Exiting'
     print ''
   elif stlowrmsp(session) == "hs":
     horizontally_split_window()
   elif stlowrmsp(session) == "vs":
     vertically_split_window()
+  elif stlowrmsp(session) == "n":
+    prHeader()
+    sessionName = raw_input("Session Name: ")
+    writeReboundScript(False)
+    # writeReboundScript("tmux attach-session -t \"" + sessionName.strip() + "\"")
+    subprocess.call(["tmux", "new", "-d", "-s", sessionName.strip()])
+    #subprocess.call(["tmux", "detach", "-s", activeSessName])
+    main()
   elif stlowrmsp(session) == "s":
+    writeReboundScript(False)
     switch_pane()
   elif stlowrmsp(session[0]) == "ka" or stlowrmsp(session[0]) == "kall" or stlowrmsp(session[0]) == "killall":
+    writeReboundScript(False)
     killAllSessions()
+    main()
   elif stlowrmsp(session[0]) == "k" and re.findall(r'\d+', stlowrmsp(session)) != []:
+    writeReboundScript(False)
     killSession(sessions, returnKillNumb(stlowrmsp(session)))
+    main()
   elif stlowrmsp(session[0]) == "k":
-    subprocess.call(["tmux", "kill-session", "-t" + activeSessName])
+    writeReboundScript(False)
+    subprocess.call(["tmux", "kill-session", "-t " + activeSessName])
   elif stlowrmsp(session[0]) == "d" or stlowrmsp(session.split(' ')[0]) == "detach":
-    subprocess.call(["tmux", "detach", "-s" + activeSessName])
+    writeReboundScript(False)
+    subprocess.call(["tmux", "detach", "-s", activeSessName])
+  # elif session.isdigit() and int(session)-1 < len(sessions):
+  #   switchToSession(int(session), activeSessName, sessions)
   else:
     print '' 
     print "...You are Currently in a Session"
