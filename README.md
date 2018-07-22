@@ -5,32 +5,30 @@
   * [Usage](#usage)
 
 ## Description
-A python wrapper for tmux. It provides users with  a terminal interface that makes working with multiple sessions simpler. Users can easily start, detach, kill, or switch sessions.
+A simple python wrapper for tmux. It provides users with a terminal interface that makes it easy to manage multiple sessions. Start, detach, kill, or rename sessions with a few keystrokes.
 
 ![Alt text](./screen_shots/screen_shot_1.png?raw=true "Screen Shot 1")
 
 ## Installation
-- Clone this repository into your home directory
-  - git clone git@github.com:gschnall/tmux-session-manager.git
-- In your bashrc include this: alias tsm='python ~/.tmux-scripts/session-manager.py'
-  - Be sure you are using python 2
-- restart your terminal application
-- Start the program by typing 'tsm' and hitting enter
-- Note: This will be available via pip soon.
+1. Run the following line your terminal:
+   git clone git@github.com:gschnall/tmux-session-manager.git ~/.tmux-session-manager`
+2. In your bashrc include the following line:
+   alias ts='python ~/.tmux-session-manager/session-manager.py'
+3. Be sure that it's being run with python 2
+4. Restart your terminal application or source your bashrc 
+5. Start the program by typing 'ts' and hitting enter
 
 ## Usage
 - Start a new session by typing 'n', provide a name for the session or hit enter to leave it blank.
 - Use 'vs' and 'hs' to split the screen vertically or horizontally
   - If you aren't already in a session, this will automatically start one for you
-- Type 'd' to detach from your current session
-- Type the prefix k and the associated number of your session to kill it ('k1' for example)
-- Type 'ka' to kill all sessions
+- Type 'd' to detach from your current session or 'k' to kill it
+- Type the prefix k and the associated session number to kill it   ( for example: 'k1')
+- Type the prefix d and the associated session number to detach it ( for example: 'd1')
+- Type the prefix r and the associated session number to rename it ( for example: 'r1')
+- Type the prefix a and the associated session number to attach it ( for example: 'a1')
+- Type 'ka' to kill all sessions (Note: for your own safety, 'ka' will only work outside of a session)
 - Type 'q' to quit at any time
-- Though not very useful, you can type 's' to see the pane numbers and switch to a specific pane. It might be useful if you have a complex pane setup.
+- It's a pretty useless feature but you can type 's' to see the pane numbers and switch to a specific pane
 
 ![Alt text](./screen_shots/screen_shot_2.png?raw=true "Screen Shot 2")
-
-## Advanced Usage
-- You can also use Tmux-Session-Manager to display and start your own custom tmux scripts.
-- Create a bash script that sets up a tmux session and place it in the session-scripts directory
-- Example scripts can be found in the example-script-directory
