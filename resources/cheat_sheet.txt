@@ -1,0 +1,104 @@
+---------------------------------------
+|                                     |
+|  a Tmux Cheat Sheet /[O~O]\ -- Rad  |
+|                                     |
+---------------------------------------
+
+The default prefix is C-b
+If you prefer C-a (I do), you need to add this to `~/.tmux.conf`:
+# ---------------------
+  set -g prefix C-a    # remap prefix to Control + a
+  bind C-a send-prefix # bind 'C-a C-a' to type 'C-a'
+  unbind C-b           # unbind Control + b 
+# ---------------------
+
+--------------------------------------------------------
+| I assume that C-a is your prefix in this cheat sheet |
+--------------------------------------------------------
+Create a session:
+> tmux new-session -s `Session Name or Number`
+
+Attach to a session:
+> tmux attach -t `Session Name or Number`
+
+Detach from a session
+> tmux detach
+
+--------------------------------------
+| Key Shortcuts - While in a Session |
+--------------------------------------
+C-a d     detach from a session
+
+C-a (     previous session
+C-a )     next session
+C-a L     ‘last’ (previously used) session
+C-a s     choose a session from a list
+
+C -a $    rename the current session
+
+C-a "     split vertically (top/bottom)
+C-a %     split horizontally (left/right)
+
+C-a left  go to the next pane on the left
+C-a right (or one of these other directions)
+C-a up
+C-a down
+C-a o     go to the next pane (cycle through all of them)
+C-a ;     go to the ‘last’ (previously used) pane
+
+C-a x     kill the current pane
+
+C-a c     create a new window
+
+C-a 1 ... switch to window 1, ..., 9, 0
+C-a 9
+C-a 0
+C-a p     previous window
+C-a n     next window
+C-a l     ‘last’ (previously used) window
+C-a w     choose window from a list
+
+C-a M-n   next window with a bell, activity or
+          content alert
+C-a M-p   previous such window
+
+C-a ,     rename the current window
+C-a &     kill the current window
+
+-----------------------
+| Moving panes around |
+-----------------------
+C-a {     move the current pane to the previous position
+C-a }     move the current pane to the next position
+C-a C-o   rotate window ‘up’ (i.e. move all panes)
+C-a M-o   rotate window ‘down’
+C-a !     move the current pane into a new separate
+
+------------------
+| Resizing panes |
+------------------
+C-a alt + up    (arrow-key) 
+C-a alt + down  (arrow-key) 
+C-a alt + left  (arrow-key) 
+C-a alt + right (arrow-key) 
+
+---------
+| Other |
+---------
+C-a q   display pane numbers for a short while
+
+-------------------------------------
+| Force a reload of the config file |
+-------------------------------------
+> tmux source-file ~/.tmux.conf
+
+-------------------
+| Need more help |
+-------------------
+C-a ?     Display a list of shortcuts: 
+
+  OR 
+
+> man Tmux
+
+
