@@ -1,5 +1,7 @@
 #ignore
 ./session-scripts/*
+*.DS_STORE
+*.pyc
 
 # Don't ignore
 !.gitignore
