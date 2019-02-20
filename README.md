@@ -6,8 +6,8 @@
 ## Description
 Provides a terminal interface that makes managing sessions easy. You can create, switch to, detach, kill, or rename sessions with a few keystrokes. 
 
-***If you're a Tmux noob***,🕹️ This will act as a cheat code for instant tmux productivity
-***If you're a Tmux ninja***, ⚔️ This will add another deadly weapon to your agile arsenal
+- ***If you're a Tmux noob***,🕹️ This will act as a cheat code for instant tmux productivity
+- ***If you're a Tmux ninja***, ⚔️ This will add another deadly weapon to your agile arsenal
 
 ![Alt text](./screen_shots/screen_shot_1.png?raw=true "Screen Shot 1")
 
