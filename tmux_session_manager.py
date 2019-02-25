@@ -468,7 +468,7 @@ def handleInput(scriptDir, sessions, scripts):
   elif stlowrmsp(session) == "vs":
     start_session_vertical_split()
   elif stlowrmsp(session) == "n" or stlowrmsp(session) == "new":
-    createNewSession()
+    createNewSession(sessions)
     main()
   elif stlowrmsp(session) == "ka" or stlowrmsp(session) == "kall" or stlowrmsp(session) == "killall":
     killAllSessions()
