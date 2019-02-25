@@ -66,12 +66,11 @@ def getHeader():
     ENDC = '\033[0m'
     BOLD = '\033[1m'
   return (
-    '\n' +
-    col.OKGREEN + '|:::::|::::|:::|:::::::::::::::::::|' + col.ENDC + '\n' +
-    col.OKBLUE  + '|--  -|-  -|-  |-- |--  --  -- -- -|' + col.ENDC + '\n' + 
-    col.BOLD    + '|---| Tmux-Session-Manager \[O-O]/ |' + col.ENDC + '\n' + 
-    col.OKBLUE  + '|--  -|-  -|-  |-- |--  --  -- ----|' + col.ENDC + '\n' + 
-    col.OKGREEN + '|:::::|::::|:::|:::::::::::::::::::|' + col.ENDC + '\n'
+    col.OKGREEN + '    :  :  : :   ::  ::  ::  :: :: : ' + col.ENDC + '\n' +
+    col.OKBLUE  + '|___-_|-__-|-__|--_|--__--__--_--_-|' + col.ENDC + '\n' + 
+    col.BOLD    + '|---| Tmux-Session-Manager' + color_text("red", " > > > > > >") + col.ENDC + '\n' + 
+    col.OKBLUE  + '|___-_|-__-|-__|--_|--__--__--_--_-|' + col.ENDC + '\n' #+ 
+    # col.OKGREEN + ' ::::: :::: ::: ::::::::::::::::::: ' + col.ENDC + '\n'
   )
 
 def prError(err):
@@ -148,7 +147,16 @@ def getName(session):
 def getLenOfSessionName(session):
   return len(getName(session))
 
+def getLineBreak(snl, maxsnl):
+  lineBreak = "-----------------------------------"
+  for ind in range(min(maxsnl, snl) - 1):
+    lineBreak += "-"
+  return lineBreak
+
 def truncateSessionName(sn, maxLength):
+  return (sn[:maxLength-2] + '>>') if len(sn) > maxLength else sn
+
+def truncateSessionNameWithDots(sn, maxLength):
   return (sn[:maxLength-2] + '..') if len(sn) > maxLength else sn
 
 def returnSessionNumber(st):
@@ -157,14 +165,20 @@ def returnSessionNumber(st):
 def stlowrmsp(inp): #str lower & remove spaces
   return str(inp).replace("  ","").lower()
 
+def attachText(col, n, padding):
+  return padding + color_text("green", str(n)) + (":ATTACH" if n == 1 else "")
+
+def switchText(col, n, padding, showText):
+  return padding + color_text("green", str(n)) + (":SWITCH" if (n == 1) or (showText and n == 2) else "")
+
+def detachText(col, n, padding):
+  return padding + col.WARNING + "d" + col.ENDC + ":DETACH"
+
 def killText(col, n):
-  return col.FAIL + "k" + str(n) + col.ENDC + ":kill"
+  return col.FAIL + "k" + str(n) + col.ENDC + (":KILL" if n == 1 else "")
 
 def renameText(col, n):
-  return col.WARNING + "r" + str(n) + col.ENDC + ":rename"
-
-def detachText(col, n):
-  return col.WARNING + "d" + col.ENDC + ":detach"
+  return col.WARNING + "r" + str(n) + col.ENDC + (":RENAME" if n == 1 else "")
 # ||---------------------------||
 
 def generateAllSessions(sessions, scripts):
@@ -212,14 +226,26 @@ def killSession(sessions, sessNumb):
   else:
     main("Session number not found")
 
-def createNewSession():
-  # - Get Session Name 
+def createNewSession(sessions):
+  nameDict = {};
+  for sess in sessions:
+    nameDict[getName(sess)] = 1
+  # - Get Session Name
   sessionName = ""
+  duplicateName = False
   while (not validSessionName(sessionName.strip())):
     prHeader()
     if sessionName != "":
       prError("Names cannot contain colons or periods")
+    elif duplicateName:
+      prError("Duplicate Name: " + duplicateName + " already exists")
+      duplicateName = False
+
     sessionName = raw_input("/[O~O]\ --Session Name: ")
+
+    if sessionName.strip() in nameDict:
+      duplicateName = sessionName.strip()
+      sessionName = ""
   # - Get Session Directory
   directoryPath = ""
   while (directoryPath == "" or not os.path.isdir(directoryPath)):
@@ -237,22 +263,38 @@ def createNewSession():
     readline.set_startup_hook(lambda: readline.insert_text(os.path.expanduser('~/'))) 
     readline.set_completer(completer.pathCompleter)
     
-    directoryPath = raw_input("\n" + "[O~O]/ --Directory: ")
+    directoryPath = raw_input("\n" + color_text("green", "- Directory: "))
   # - Reset Readline and Create New Session 
   readline.set_startup_hook(lambda: readline.insert_text(''))
   subprocess.call(["tmux", "new", "-d", "-s", sessionName.strip(), "-c", directoryPath])
 
 def renameSession(sessions, sessNumb):
   if( sessions[sessNumb-1] > -1 ):
+    nameDict = {};
+    for sess in sessions:
+      nameDict[getName(sess)] = 1
+
     sessionName = getName(sessions[sessNumb-1])
+    readline.set_startup_hook(lambda: readline.insert_text(sessionName))
     # - Get Session Name 
     newSessionName = ""
+    duplicateName = False
     while (not validSessionName(newSessionName.strip())):
       prHeader()
       if newSessionName != "":
         prError("Names cannot contain colons or periods") 
+      elif duplicateName:
+        prError("Duplicate Name: " + duplicateName + " already exists")
+        duplicateName = False
+
       newSessionName = raw_input("\[O~O]/ --Rename " + color_text("blue", sessionName) + " to: \n\n> ")
+
+      if newSessionName != sessionName and newSessionName.strip() in nameDict:
+        duplicateName = newSessionName.strip()
+        newSessionName = ""
+
     subprocess.call(["tmux", "rename-session", "-t", sessionName, newSessionName])
+    readline.set_startup_hook(lambda: readline.insert_text(''))
   else:
     main("Session number not found")
 
@@ -321,50 +363,59 @@ def prNoneActive(col, scripts):
     print col.OKBLUE + str(scripts.index(script)+1) + col.ENDC + ': ' + script.split('.')[0] + " (" + col.OKBLUE + str(scripts.index(script)+1) + col.ENDC + ":start" +  ")"
 
 def prNoneAttached(col, sessions, sessionNameLength, maxSessionNameLength):
-  printText = "";
-
-  for ind, s in enumerate(sessions):
-    sessName = truncateSessionName(getName(s), maxSessionNameLength)
-    snl = getLenOfSessionName(s)
-    spaces = (" " * (sessionNameLength - snl))
-    if is_attached(s) == "detached":
-      printText += color_text('blue', str(ind+1)) + ':' + sessName + "|" + color_text('green', str(ind+1)) + ":attach" + "|" + renameText(col, ind+1) + "|" + killText(col, ind+1) + "\n"
-    elif is_attached(s) == "script":
-      printText += color_text('blue', str(ind+1)) + ':' + sessName + "|" + color_text('blue', str(ind+1)) + ":start" +  "\n"
-  printAsColumn(printText, "|")
-
-def prSessionAttached(col, sessions, sessionNameLength, maxSessionNameLength, sessionName):
-  print "in " + col.OKGREEN + sessionName + col.ENDC
-  print ''
+  lineBreak = getLineBreak(sessionNameLength, maxSessionNameLength)
+  print lineBreak
   printText = ""
 
   for ind, s in enumerate(sessions):
     sessName = truncateSessionName(getName(s), maxSessionNameLength)
     snl = getLenOfSessionName(s)
-    spaces = (" " * (sessionNameLength - snl))
+    space = " " if ind + 1 < 10 else ""
     if is_attached(s) == "detached":
-      printText += color_text("blue", str(ind+1)) + '.' + "|" + color_text("white", sessName) + "|" + color_text('green', str(ind+1)) + ":switch" + "|" + renameText(col, ind+1) + "|" + killText(col, ind+1) + "\n"
-    elif is_attached(s) == "attached":
-      printText += color_text("blue", str(ind+1)) + '.' + "|" + color_text("green", sessName) + "|" + detachText(col, ind+1) + "|" + renameText(col, ind+1) + "|" + killText(col, ind+1) + "\n"
+      printText += space + color_text("blue", str(ind+1)) + ' ' + color_text("white", sessName) + "." + attachText(col, ind+1, space) + "." + renameText(col, ind+1) + "." + killText(col, ind+1) + "\n" 
     elif is_attached(s) == "script":
-      printText += ccolor_text("blue", str(ind+1)) + '.' + "|" + sessName + "\n"
-  printAsColumn(printText, "|")
+      printText += space + color_text('blue', str(ind+1)) + ' ' + sessName + "." + color_text('blue', str(ind+1)) + ":start" +  "\n"
+  printAsColumn(printText, ".")
+  print lineBreak + "\n"
+
+def prSessionAttached(col, sessions, sessionNameLength, maxSessionNameLength, sessionName):
+  # print "in " + col.OKGREEN + sessionName + col.ENDC
+  sessOneIsAttached = False 
+  lineBreak = getLineBreak(sessionNameLength, maxSessionNameLength)
+  print lineBreak
+  printText = ""
+
+  for ind, s in enumerate(sessions):
+    sessName = truncateSessionName(getName(s), maxSessionNameLength)
+    snl = getLenOfSessionName(s)
+    space = " " if ind + 1 < 10 else ""
+    if is_attached(s) == "detached":
+      printText += space + color_text("blue", str(ind+1)) + ' ' + color_text("white", sessName) + "." + switchText(col, ind+1, space, sessOneIsAttached) + "." + renameText(col, ind+1) + "." + killText(col, ind+1) + "\n" 
+    elif is_attached(s) == "attached":
+      if (ind + 1 == 1):
+        sessOneIsAttached = True
+      printText += space + color_text("blue", str(ind+1)) + ' ' + color_text("green", sessName) + "." + detachText(col, ind+1, space) + "." + renameText(col, ind+1) + "." + killText(col, ind+1) + "\n" 
+    elif is_attached(s) == "script":
+      printText += spae + color_text("blue", str(ind+1)) + ' ' + sessName + endLine 
+  printAsColumn(printText, ".")
+  print lineBreak + "\n"
+  # print "\n"
 
 def printInSessionOptions(col):
-  print col.OKBLUE + 'q' + col.ENDC + ':' + '  Quit'
-  print col.OKBLUE + 'n' + col.ENDC + ':' + '  New Tmux Session'
-  print col.OKBLUE + 'c' + col.ENDC + ':' + '  View Cheat Sheet'
-  print col.FAIL + 'ka' + col.ENDC + ':' + ' Kill All Sessions'
+  print "  " + col.OKBLUE + 'q' + col.ENDC + ':' + '  Quit'
+  print "  " + col.OKBLUE + 'n' + col.ENDC + ':' + '  New Tmux Session'
+  print "  " + col.OKBLUE + 'c' + col.ENDC + ':' + '  View Cheat Sheet'
+  print "  " + col.FAIL + 'ka' + col.ENDC + ':' + ' Kill All Sessions'
   # print col.OKBLUE + 's' + col.ENDC + ':' + ' Switch Pane'
   # print col.OKBLUE + 'vs' + col.ENDC + ':' + ' Vertical Split' + " | " + col.OKBLUE + 'hs' + col.ENDC + ':' + ' Horizontal Split'
 
 def printDefaultOptions(col, sessions):
-  print col.OKBLUE + 'q' + col.ENDC + ':' + '  Quit'
-  print col.OKBLUE + 'n' + col.ENDC + ':' + '  New Tmux Session'
-  print col.OKBLUE + 'c' + col.ENDC + ':' + '  View Cheat Sheet'
-  print col.OKBLUE + 'vs' + col.ENDC + ':' + ' Vertical Split' + " | " + col.OKBLUE + 'hs' + col.ENDC + ':' + ' Horizontal Split'
+  print "  " + col.OKBLUE + 'q' + col.ENDC + ':' + '  Quit'
+  print "  " + col.OKBLUE + 'n' + col.ENDC + ':' + '  New Tmux Session'
+  print "  " + col.OKBLUE + 'c' + col.ENDC + ':' + '  View Cheat Sheet'
+  print "  " + col.OKBLUE + 'vs' + col.ENDC + ':' + ' Vertical Split' + " | " + col.OKBLUE + 'hs' + col.ENDC + ':' + ' Horizontal Split'
   if a_session_is_alive(sessions):
-    print col.FAIL + 'ka' + col.ENDC + ':' + ' Kill All Sessions'
+    print "  " + col.FAIL + 'ka' + col.ENDC + ':' + ' Kill All Sessions'
 
 def printSessionInformation(col, sessions):
   if a_session_is_alive(sessions): 
@@ -377,7 +428,7 @@ def prScripts(scripts, sessions, userInSession, col):
     printInSessionOptions(col)
   else:
     printDefaultOptions(col, sessions)
-  print ''
+  # print ''
   printSessionInformation(col, sessions)
   # Continue printing rest of program
   attachedSession = False
@@ -403,7 +454,6 @@ def prScripts(scripts, sessions, userInSession, col):
   else:
     prNoneActive(col, scripts)
   # Print padding
-  print ''
 
 def handleInput(scriptDir, sessions, scripts):
   session = raw_input("/[o_o]\ --What would you like to do?\n\n> ")
@@ -446,7 +496,7 @@ def handleActiveSession(activeSessName, sessions):
     subprocess.call(['less', sys.path[0] + "/resources/cheat_sheet.txt"])
     main()
   elif stlowrmsp(session) == "n" or stlowrmsp(session) == "new":
-    createNewSession()
+    createNewSession(sessions)
     main()
   # elif stlowrmsp(session) == "s":
   #   switch_pane()
@@ -467,7 +517,6 @@ def handleActiveSession(activeSessName, sessions):
     switchSessionTo(getName(sessions[int(session)-1]))
   else:
     main("Input option not recognized")
-    # handleActiveSession(activeSessName, sessions)
 
 def warnUserThatTmuxIsNotInstaled():
   subprocess.call(['clear'])
