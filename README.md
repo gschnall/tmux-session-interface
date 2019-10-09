@@ -14,15 +14,15 @@ Provides a terminal interface that makes managing sessions easy. You can create,
 ## Installation
 #### 1. Run the following line in your terminal
 ```bash 
-git clone git@github.com:gschnall/tmux-session-manager.git ~/.tmux-session-manager
+git clone git@github.com:gschnall/tmux-session-interface.git ~/.tmux-session-interface
 ```
 #### 2. Place this in your bashrc or bashprofile
 ```bash
-alias ms='python ~/.tmux-session-manager/session-manager.py'
+alias ms='python ~/.tmux-session-interface/session-manager.py'
 ```
 #### 3. Place this in your tmux.config 
 ```
-run-shell ~/.tmux-session-manager/manage.tmux
+run-shell ~/.tmux-session-interface/manage.tmux
 ```
 ***Note***: the configs are typically created at `~/.tmux.conf` and `~/.bashrc`
 
