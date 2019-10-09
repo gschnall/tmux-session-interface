@@ -68,7 +68,7 @@ def getHeader():
   return (
     col.OKGREEN + '    :  :  : :   ::  ::  ::  :: :: : ' + col.ENDC + '\n' +
     col.OKBLUE  + '|___-_|-__-|-__|--_|--__--__--_--_-|' + col.ENDC + '\n' + 
-    col.BOLD    + '|---| Tmux-Session-Manager' + color_text("red", " > > > > > >") + col.ENDC + '\n' + 
+    col.BOLD    + '|---| Tmux-Session-Interface' + color_text("red", " > > > > >") + col.ENDC + '\n' + 
     col.OKBLUE  + '|___-_|-__-|-__|--_|--__--__--_--_-|' + col.ENDC + '\n' #+ 
     # col.OKGREEN + ' ::::: :::: ::: ::::::::::::::::::: ' + col.ENDC + '\n'
   )
@@ -342,7 +342,7 @@ def switch_pane():
   subprocess.call(['tmux', 'display-panes'])
   prHeader()
   print ""
-  print color_text('blue', 'q') + ':' + 'Quit Tmux-Session-Manager' + OKBLUE + ' s' + ENDC + ':' + 'show pane numbers'
+  print color_text('blue', 'q') + ':' + 'Quit Tmux-Session-Interface' + OKBLUE + ' s' + ENDC + ':' + 'show pane numbers'
   paneNumb = raw_input("Switch to pane number: ")
   if paneNumb == "q" or paneNumb == "quit":
     print 'Exiting'
@@ -521,7 +521,7 @@ def handleActiveSession(activeSessName, sessions):
 def warnUserThatTmuxIsNotInstaled():
   subprocess.call(['clear'])
   print ""
-  print "--- You must install tmux in order to use Tmux Session Manager --- \n" 
+  print "--- You must install tmux in order to use Tmux Session Interface --- \n" 
   print "To install for Mac use: 'sudo brew install tmux'"
   print "To install for ubuntu use: 'sudo apt-get install tmux'"
   print ""
