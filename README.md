@@ -1,3 +1,6 @@
+Deprecated - See https://github.com/gschnall/tmint
+T mint is an improved version of tmux-session-interface created with Go
+
 ## Table of contents
 - [Description](#description)
 - [Installation](#installation)
